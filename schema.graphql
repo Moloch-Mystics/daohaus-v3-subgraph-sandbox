@@ -1,0 +1,25 @@
+type Dao @entity {
+  id: ID!
+  createdAt: String!
+  summonTransactionHash: Bytes!
+  daoAddress: Bytes!
+  lootAddress: Bytes!
+  safeAddress: Bytes!
+  lootPaused: Boolean
+  sharesPaused: Boolean
+  gracePeriod: BigInt
+  votingPeriod: BigInt
+  proposalOffering: BigInt
+  quorumPercent: BigInt
+  sponsorThreshold: BigInt
+  minRetentionPercent: BigInt
+  shareTokenName: String
+  shareTokenSymbol: String
+  totalShares: BigInt
+  totalLoot: BigInt
+}
+
+type EventTransaction @entity {
+  id: ID!
+  createdAt: String!
+}
