@@ -6,9 +6,10 @@ import {
   TypedMap,
   json,
   ByteArray,
+  Address,
 } from "@graphprotocol/graph-ts";
-// import { NewPost } from "../../generated/Poster/Poster";
-// import { Content } from "../../generated/schema";
+import { NewPost } from "../../generated/Poster/Poster";
+import { MetaData } from "../../generated/schema";
 
 class JsonStringResult {
   data: string;
@@ -50,6 +51,38 @@ export namespace parser {
     }
     result.data = value.toString();
     return result;
+  }
+
+  export function createDaoMetaSummoning(
+    object: TypedMap<string, JSONValue>,
+    daoAddress: Bytes | null,
+
+    event: NewPost
+  ): boolean {
+    if (daoAddress === null) {
+      return false;
+    }
+    let entityId = daoAddress
+      .toHexString()
+      .concat("-content-")
+      .concat(event.block.timestamp.toString());
+    let entity = new MetaData(entityId);
+
+    let name = parser.getStringFromJson(object, "name");
+    if (name.error != "none") {
+      return false;
+    }
+    entity.name = name.data;
+
+    entity.createdAt = event.block.timestamp.toString();
+    entity.daoAddress = daoAddress;
+    entity.createdBy = daoAddress;
+    entity.dao = daoAddress.toHexString();
+    entity.rawContent = event.params.content;
+
+    entity.save();
+
+    return true;
   }
 
   // export function createBasicContent(

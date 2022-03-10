@@ -24,8 +24,14 @@ module.exports.config = {
       {
         name: "baalSummoner",
         template: "baal-summoner-ds.yaml",
-        address: "0x1b94221EB2bC8dc9F16660EA5be9dcd92b0ae862",
-        startBlock: 10294289,
+        address: "0x31C948A5Ad149853B211de025082b61573ef3979",
+        startBlock: 10305239,
+      },
+      {
+        name: "poster",
+        template: "poster-ds.yaml",
+        address: "0x000000000000cd17345801aa8147b8d3950260ff",
+        startBlock: 10305239,
       },
     ],
     templates: [

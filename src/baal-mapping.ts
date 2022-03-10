@@ -28,7 +28,7 @@ export function handleSetupComplete(event: SetupComplete): void {
 
   dao.save();
 
-  addTransaction(event.block, event.transaction);
+  // addTransaction(event.block, event.transaction);
 }
 
 // TransferLoot (index_topic_1 address from, index_topic_2 address to, uint256 amount)

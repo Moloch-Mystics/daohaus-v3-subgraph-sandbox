@@ -203,40 +203,18 @@ export class BaalSummoner extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  poster(): Address {
-    let result = super.call("poster", "poster():(address)", []);
+  summonBaal(_safe: Address): Address {
+    let result = super.call("summonBaal", "summonBaal(address):(address)", [
+      ethereum.Value.fromAddress(_safe)
+    ]);
 
     return result[0].toAddress();
   }
 
-  try_poster(): ethereum.CallResult<Address> {
-    let result = super.tryCall("poster", "poster():(address)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  summonBaal(_safe: Address, _details: string): Address {
-    let result = super.call(
-      "summonBaal",
-      "summonBaal(address,string):(address)",
-      [ethereum.Value.fromAddress(_safe), ethereum.Value.fromString(_details)]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_summonBaal(
-    _safe: Address,
-    _details: string
-  ): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "summonBaal",
-      "summonBaal(address,string):(address)",
-      [ethereum.Value.fromAddress(_safe), ethereum.Value.fromString(_details)]
-    );
+  try_summonBaal(_safe: Address): ethereum.CallResult<Address> {
+    let result = super.tryCall("summonBaal", "summonBaal(address):(address)", [
+      ethereum.Value.fromAddress(_safe)
+    ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -247,17 +225,15 @@ export class BaalSummoner extends ethereum.SmartContract {
   summonBaalAndSafe(
     initializationParams: Bytes,
     initializationActions: Array<Bytes>,
-    _saltNonce: BigInt,
-    _details: string
+    _saltNonce: BigInt
   ): Address {
     let result = super.call(
       "summonBaalAndSafe",
-      "summonBaalAndSafe(bytes,bytes[],uint256,string):(address)",
+      "summonBaalAndSafe(bytes,bytes[],uint256):(address)",
       [
         ethereum.Value.fromBytes(initializationParams),
         ethereum.Value.fromBytesArray(initializationActions),
-        ethereum.Value.fromUnsignedBigInt(_saltNonce),
-        ethereum.Value.fromString(_details)
+        ethereum.Value.fromUnsignedBigInt(_saltNonce)
       ]
     );
 
@@ -267,17 +243,15 @@ export class BaalSummoner extends ethereum.SmartContract {
   try_summonBaalAndSafe(
     initializationParams: Bytes,
     initializationActions: Array<Bytes>,
-    _saltNonce: BigInt,
-    _details: string
+    _saltNonce: BigInt
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "summonBaalAndSafe",
-      "summonBaalAndSafe(bytes,bytes[],uint256,string):(address)",
+      "summonBaalAndSafe(bytes,bytes[],uint256):(address)",
       [
         ethereum.Value.fromBytes(initializationParams),
         ethereum.Value.fromBytesArray(initializationActions),
-        ethereum.Value.fromUnsignedBigInt(_saltNonce),
-        ethereum.Value.fromString(_details)
+        ethereum.Value.fromUnsignedBigInt(_saltNonce)
       ]
     );
     if (result.reverted) {
@@ -335,10 +309,6 @@ export class ConstructorCall__Inputs {
   get _gnosisMultisendLibrary(): Address {
     return this._call.inputValues[3].value.toAddress();
   }
-
-  get _poster(): Address {
-    return this._call.inputValues[4].value.toAddress();
-  }
 }
 
 export class ConstructorCall__Outputs {
@@ -391,36 +361,6 @@ export class DeployModuleCall__Outputs {
   }
 }
 
-export class PostMetadataCall extends ethereum.Call {
-  get inputs(): PostMetadataCall__Inputs {
-    return new PostMetadataCall__Inputs(this);
-  }
-
-  get outputs(): PostMetadataCall__Outputs {
-    return new PostMetadataCall__Outputs(this);
-  }
-}
-
-export class PostMetadataCall__Inputs {
-  _call: PostMetadataCall;
-
-  constructor(call: PostMetadataCall) {
-    this._call = call;
-  }
-
-  get _details(): string {
-    return this._call.inputValues[0].value.toString();
-  }
-}
-
-export class PostMetadataCall__Outputs {
-  _call: PostMetadataCall;
-
-  constructor(call: PostMetadataCall) {
-    this._call = call;
-  }
-}
-
 export class SummonBaalCall extends ethereum.Call {
   get inputs(): SummonBaalCall__Inputs {
     return new SummonBaalCall__Inputs(this);
@@ -440,10 +380,6 @@ export class SummonBaalCall__Inputs {
 
   get _safe(): Address {
     return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _details(): string {
-    return this._call.inputValues[1].value.toString();
   }
 }
 
@@ -486,10 +422,6 @@ export class SummonBaalAndSafeCall__Inputs {
 
   get _saltNonce(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
-  }
-
-  get _details(): string {
-    return this._call.inputValues[3].value.toString();
   }
 }
 

@@ -3,7 +3,7 @@ import { log } from "@graphprotocol/graph-ts";
 import { SummonBaal } from "../generated/BaalSummoner/BaalSummoner";
 import { BaalTemplate } from "../generated/templates";
 import { Dao } from "../generated/schema";
-import { addTransaction } from "./util/transactions";
+import { addTransactionWithDao } from "./util/transactions";
 
 // emit SummonBaal(
 //   address(_baal),
@@ -21,17 +21,14 @@ export function handleSummonBaal(event: SummonBaal): void {
     return;
   }
 
-  log.info("event.transaction.from", [event.transaction.from.toHexString()]);
-  // log.info("event.transaction.to", [event.transaction.to.toHexString()]);
-  log.info("event.address", [event.address.toHexString()]);
-
   dao.createdAt = event.block.timestamp.toString();
   dao.daoAddress = event.params.baal;
-  dao.transactionHash = event.transaction.hash;
+  dao.transactionHashSummon = event.transaction.hash;
   dao.lootAddress = event.params.loot;
   dao.safeAddress = event.params.safe;
 
   dao.save();
 
-  addTransaction(event.block, event.transaction);
+  // TODO: do we need withDao anymore?
+  addTransactionWithDao(event.block, event.transaction, event.params.baal);
 }
