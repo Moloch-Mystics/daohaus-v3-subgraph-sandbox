@@ -30,7 +30,7 @@ export function handleNewPost(event: NewPost): void {
   ) {
     // to validate it's from the factory we need to look at event.transaction.to
     // but would need to store all potential factory addresses
-    // danger without is a bunch of metadata record not attached to a dao
+    // only danger without is a bunch of metadata record not attached to a dao
     parser.createDaoMetaSummoning(object, event.params.user, event);
   }
 

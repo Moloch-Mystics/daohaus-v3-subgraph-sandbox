@@ -75,7 +75,6 @@ export namespace parser {
     entity.name = name.data;
 
     entity.createdAt = event.block.timestamp.toString();
-    entity.daoAddress = daoAddress;
     entity.createdBy = daoAddress;
     entity.dao = daoAddress.toHexString();
     entity.rawContent = event.params.content;

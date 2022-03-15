@@ -64,3 +64,7 @@ templates:
       eventHandlers:
         - event: SetupComplete(bool,bool,uint32,uint32,uint256,uint256,uint256,uint256,string,string,uint256,uint256)
           handler: handleSetupComplete
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: TransferLoot(indexed address,indexed address,uint256)
+          handler: handleTransferLoot

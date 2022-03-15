@@ -2,7 +2,6 @@ type Dao @entity {
   id: ID!
   createdAt: String!
   transactionHashSummon: Bytes!
-  daoAddress: Bytes!
   lootAddress: Bytes!
   safeAddress: Bytes!
   lootPaused: Boolean
@@ -15,23 +14,30 @@ type Dao @entity {
   minRetentionPercent: BigInt
   shareTokenName: String
   shareTokenSymbol: String
-  totalShares: BigInt
-  totalLoot: BigInt
+  totalShares: BigInt!
+  totalLoot: BigInt!
   metaData: MetaData @derivedFrom(field: "dao")
 }
 
 type MetaData @entity {
   id: ID!
   createdAt: String!
-  daoAddress: Bytes!
   createdBy: Bytes!
   dao: Dao
   name: String
   rawContent: String!
 }
 
+type Member @entity {
+  id: ID!
+  createdAt: String!
+  dao: Dao
+  memberAddress: Bytes!
+  shares: BigInt!
+  loot: BigInt!
+}
+
 type EventTransaction @entity {
   id: ID!
   createdAt: String!
-  summonedDao: Bytes
 }

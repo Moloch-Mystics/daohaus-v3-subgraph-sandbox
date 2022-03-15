@@ -19,11 +19,12 @@ export class Dao extends Entity {
 
     this.set("createdAt", Value.fromString(""));
     this.set("transactionHashSummon", Value.fromBytes(Bytes.empty()));
-    this.set("daoAddress", Value.fromBytes(Bytes.empty()));
     this.set("lootAddress", Value.fromBytes(Bytes.empty()));
     this.set("safeAddress", Value.fromBytes(Bytes.empty()));
     this.set("lootPaused", Value.fromBoolean(false));
     this.set("sharesPaused", Value.fromBoolean(false));
+    this.set("totalShares", Value.fromBigInt(BigInt.zero()));
+    this.set("totalLoot", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -68,15 +69,6 @@ export class Dao extends Entity {
 
   set transactionHashSummon(value: Bytes) {
     this.set("transactionHashSummon", Value.fromBytes(value));
-  }
-
-  get daoAddress(): Bytes {
-    let value = this.get("daoAddress");
-    return value!.toBytes();
-  }
-
-  set daoAddress(value: Bytes) {
-    this.set("daoAddress", Value.fromBytes(value));
   }
 
   get lootAddress(): Bytes {
@@ -251,38 +243,22 @@ export class Dao extends Entity {
     }
   }
 
-  get totalShares(): BigInt | null {
+  get totalShares(): BigInt {
     let value = this.get("totalShares");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalShares(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalShares");
-    } else {
-      this.set("totalShares", Value.fromBigInt(<BigInt>value));
-    }
+  set totalShares(value: BigInt) {
+    this.set("totalShares", Value.fromBigInt(value));
   }
 
-  get totalLoot(): BigInt | null {
+  get totalLoot(): BigInt {
     let value = this.get("totalLoot");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalLoot(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalLoot");
-    } else {
-      this.set("totalLoot", Value.fromBigInt(<BigInt>value));
-    }
+  set totalLoot(value: BigInt) {
+    this.set("totalLoot", Value.fromBigInt(value));
   }
 
   get metaData(): string | null {
@@ -309,7 +285,6 @@ export class MetaData extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("createdAt", Value.fromString(""));
-    this.set("daoAddress", Value.fromBytes(Bytes.empty()));
     this.set("createdBy", Value.fromBytes(Bytes.empty()));
     this.set("rawContent", Value.fromString(""));
   }
@@ -347,15 +322,6 @@ export class MetaData extends Entity {
 
   set createdAt(value: string) {
     this.set("createdAt", Value.fromString(value));
-  }
-
-  get daoAddress(): Bytes {
-    let value = this.get("daoAddress");
-    return value!.toBytes();
-  }
-
-  set daoAddress(value: Bytes) {
-    this.set("daoAddress", Value.fromBytes(value));
   }
 
   get createdBy(): Bytes {
@@ -411,6 +377,97 @@ export class MetaData extends Entity {
   }
 }
 
+export class Member extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("createdAt", Value.fromString(""));
+    this.set("memberAddress", Value.fromBytes(Bytes.empty()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
+    this.set("loot", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Member entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Member entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Member", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Member | null {
+    return changetype<Member | null>(store.get("Member", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value!.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
+
+  get dao(): string | null {
+    let value = this.get("dao");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set dao(value: string | null) {
+    if (!value) {
+      this.unset("dao");
+    } else {
+      this.set("dao", Value.fromString(<string>value));
+    }
+  }
+
+  get memberAddress(): Bytes {
+    let value = this.get("memberAddress");
+    return value!.toBytes();
+  }
+
+  set memberAddress(value: Bytes) {
+    this.set("memberAddress", Value.fromBytes(value));
+  }
+
+  get shares(): BigInt {
+    let value = this.get("shares");
+    return value!.toBigInt();
+  }
+
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
+  }
+
+  get loot(): BigInt {
+    let value = this.get("loot");
+    return value!.toBigInt();
+  }
+
+  set loot(value: BigInt) {
+    this.set("loot", Value.fromBigInt(value));
+  }
+}
+
 export class EventTransaction extends Entity {
   constructor(id: string) {
     super();
@@ -454,22 +511,5 @@ export class EventTransaction extends Entity {
 
   set createdAt(value: string) {
     this.set("createdAt", Value.fromString(value));
-  }
-
-  get summonedDao(): Bytes | null {
-    let value = this.get("summonedDao");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set summonedDao(value: Bytes | null) {
-    if (!value) {
-      this.unset("summonedDao");
-    } else {
-      this.set("summonedDao", Value.fromBytes(<Bytes>value));
-    }
   }
 }
