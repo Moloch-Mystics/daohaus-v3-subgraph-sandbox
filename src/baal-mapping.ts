@@ -1,5 +1,5 @@
 import { BigInt, log } from "@graphprotocol/graph-ts";
-import { Dao, Member, Proposal, Shaman } from "../generated/schema";
+import { Dao, Member, Proposal, Shaman, Vote } from "../generated/schema";
 
 import {
   CancelProposal,
@@ -12,6 +12,7 @@ import {
   SharesPaused,
   SponsorProposal,
   SubmitProposal,
+  SubmitVote,
   Transfer,
   TransferLoot,
 } from "../generated/templates/BaalTemplate/Baal";
@@ -304,6 +305,7 @@ export function handleSubmitProposal(event: SubmitProposal): void {
   proposal.actionFailed = false;
   proposal.passed = false;
   proposal.proposalOffering = event.transaction.value;
+  proposal.maxTotalSharesAndLootAtYesVote = constants.BIGINT_ZERO;
 
   proposal.selfSponsor = event.params.selfSponsor;
   // proposal.sponsor = event.params.selfSponsor
@@ -416,14 +418,64 @@ export function handleCancelProposal(event: CancelProposal): void {
   proposal.save();
 }
 
+export function handleSubmitVote(event: SubmitVote): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  let proposalId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toString());
+
+  let proposal = Proposal.load(proposalId);
+  if (proposal === null) {
+    return;
+  }
+
+  let voteId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toHexString())
+    .concat("-vote-")
+    .concat(event.params.member.toHexString());
+
+  let vote = new Vote(voteId);
+
+  vote.createdAt = event.block.timestamp.toString();
+  vote.daoAddress = event.address;
+  vote.approved = event.params.approved;
+  vote.balance = event.params.balance;
+
+  let memberId = event.address
+    .toHexString()
+    .concat("-member-")
+    .concat(event.params.member.toHexString());
+  vote.member = memberId;
+  vote.proposal = proposalId;
+
+  if (event.params.approved) {
+    proposal.yesVotes = proposal.yesVotes.plus(constants.BIGINT_ONE);
+    proposal.yesBalance = proposal.yesBalance.plus(event.params.balance);
+    proposal.maxTotalSharesAndLootAtYesVote = dao.totalShares.plus(
+      dao.totalLoot
+    );
+  } else {
+    proposal.noVotes = proposal.noVotes.plus(constants.BIGINT_ONE);
+    proposal.noBalance = proposal.noBalance.plus(event.params.balance);
+  }
+
+  vote.save();
+  proposal.save();
+}
+
 // - Approval(indexed address,indexed address,uint256)
 // - AvatarSet(indexed address,indexed address)
 // - ChangedGuard(address)
 // - DelegateChanged(indexed address,indexed address,indexed address)
 // - DelegateVotesChanged(indexed address,uint256,uint256)
 // - Ragequit(indexed address,address,indexed uint256,indexed uint256,address[])
-// - SubmitVote(indexed address,uint256,indexed uint256,indexed bool)
 // - TargetSet(indexed address,indexed address)
-
 // - OwnershipTransferred(indexed address,indexed address)
 // why twice on summon - once from summoner to safe and once from 0x0 to safe

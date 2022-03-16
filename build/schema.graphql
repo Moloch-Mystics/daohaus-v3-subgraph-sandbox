@@ -45,6 +45,22 @@ type Proposal @entity {
   actionFailed: Boolean!
   passed: Boolean!
   proposalOffering: BigInt!
+  yesVotes: BigInt!
+  noVotes: BigInt!
+  yesBalance: BigInt!
+  noBalance: BigInt!
+  maxTotalSharesAndLootAtYesVote: BigInt!
+  votes: [Vote!] @derivedFrom(field: "proposal")
+}
+
+type Vote @entity {
+  id: ID!
+  createdAt: String!
+  daoAddress: Bytes!
+  approved: Boolean!
+  balance: BigInt!
+  proposal: Proposal!
+  member: Member!
 }
 
 type MetaData @entity {
@@ -63,6 +79,7 @@ type Member @entity {
   memberAddress: Bytes!
   shares: BigInt!
   loot: BigInt!
+  votes: [Vote!] @derivedFrom(field: "member")
 }
 
 type Shaman @entity {
