@@ -23,8 +23,15 @@ export class Dao extends Entity {
     this.set("safeAddress", Value.fromBytes(Bytes.empty()));
     this.set("lootPaused", Value.fromBoolean(false));
     this.set("sharesPaused", Value.fromBoolean(false));
+    this.set("gracePeriod", Value.fromBigInt(BigInt.zero()));
+    this.set("votingPeriod", Value.fromBigInt(BigInt.zero()));
+    this.set("proposalOffering", Value.fromBigInt(BigInt.zero()));
+    this.set("quorumPercent", Value.fromBigInt(BigInt.zero()));
+    this.set("sponsorThreshold", Value.fromBigInt(BigInt.zero()));
+    this.set("minRetentionPercent", Value.fromBigInt(BigInt.zero()));
     this.set("totalShares", Value.fromBigInt(BigInt.zero()));
     this.set("totalLoot", Value.fromBigInt(BigInt.zero()));
+    this.set("latestSponsoredProposalId", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -107,106 +114,58 @@ export class Dao extends Entity {
     this.set("sharesPaused", Value.fromBoolean(value));
   }
 
-  get gracePeriod(): BigInt | null {
+  get gracePeriod(): BigInt {
     let value = this.get("gracePeriod");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set gracePeriod(value: BigInt | null) {
-    if (!value) {
-      this.unset("gracePeriod");
-    } else {
-      this.set("gracePeriod", Value.fromBigInt(<BigInt>value));
-    }
+  set gracePeriod(value: BigInt) {
+    this.set("gracePeriod", Value.fromBigInt(value));
   }
 
-  get votingPeriod(): BigInt | null {
+  get votingPeriod(): BigInt {
     let value = this.get("votingPeriod");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set votingPeriod(value: BigInt | null) {
-    if (!value) {
-      this.unset("votingPeriod");
-    } else {
-      this.set("votingPeriod", Value.fromBigInt(<BigInt>value));
-    }
+  set votingPeriod(value: BigInt) {
+    this.set("votingPeriod", Value.fromBigInt(value));
   }
 
-  get proposalOffering(): BigInt | null {
+  get proposalOffering(): BigInt {
     let value = this.get("proposalOffering");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set proposalOffering(value: BigInt | null) {
-    if (!value) {
-      this.unset("proposalOffering");
-    } else {
-      this.set("proposalOffering", Value.fromBigInt(<BigInt>value));
-    }
+  set proposalOffering(value: BigInt) {
+    this.set("proposalOffering", Value.fromBigInt(value));
   }
 
-  get quorumPercent(): BigInt | null {
+  get quorumPercent(): BigInt {
     let value = this.get("quorumPercent");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set quorumPercent(value: BigInt | null) {
-    if (!value) {
-      this.unset("quorumPercent");
-    } else {
-      this.set("quorumPercent", Value.fromBigInt(<BigInt>value));
-    }
+  set quorumPercent(value: BigInt) {
+    this.set("quorumPercent", Value.fromBigInt(value));
   }
 
-  get sponsorThreshold(): BigInt | null {
+  get sponsorThreshold(): BigInt {
     let value = this.get("sponsorThreshold");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set sponsorThreshold(value: BigInt | null) {
-    if (!value) {
-      this.unset("sponsorThreshold");
-    } else {
-      this.set("sponsorThreshold", Value.fromBigInt(<BigInt>value));
-    }
+  set sponsorThreshold(value: BigInt) {
+    this.set("sponsorThreshold", Value.fromBigInt(value));
   }
 
-  get minRetentionPercent(): BigInt | null {
+  get minRetentionPercent(): BigInt {
     let value = this.get("minRetentionPercent");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set minRetentionPercent(value: BigInt | null) {
-    if (!value) {
-      this.unset("minRetentionPercent");
-    } else {
-      this.set("minRetentionPercent", Value.fromBigInt(<BigInt>value));
-    }
+  set minRetentionPercent(value: BigInt) {
+    this.set("minRetentionPercent", Value.fromBigInt(value));
   }
 
   get shareTokenName(): string | null {
@@ -261,6 +220,32 @@ export class Dao extends Entity {
     this.set("totalLoot", Value.fromBigInt(value));
   }
 
+  get latestSponsoredProposalId(): BigInt {
+    let value = this.get("latestSponsoredProposalId");
+    return value!.toBigInt();
+  }
+
+  set latestSponsoredProposalId(value: BigInt) {
+    this.set("latestSponsoredProposalId", Value.fromBigInt(value));
+  }
+
+  get members(): Array<string> | null {
+    let value = this.get("members");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set members(value: Array<string> | null) {
+    if (!value) {
+      this.unset("members");
+    } else {
+      this.set("members", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
   get metaData(): string | null {
     let value = this.get("metaData");
     if (!value || value.kind == ValueKind.NULL) {
@@ -276,6 +261,250 @@ export class Dao extends Entity {
     } else {
       this.set("metaData", Value.fromString(<string>value));
     }
+  }
+}
+
+export class Proposal extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("createdAt", Value.fromString(""));
+    this.set("createdBy", Value.fromBytes(Bytes.empty()));
+    this.set("dao", Value.fromString(""));
+    this.set("proposalId", Value.fromBigInt(BigInt.zero()));
+    this.set("prevProposalId", Value.fromBigInt(BigInt.zero()));
+    this.set("proposalDataHash", Value.fromBytes(Bytes.empty()));
+    this.set("votingPeriod", Value.fromBigInt(BigInt.zero()));
+    this.set("votingStarts", Value.fromBigInt(BigInt.zero()));
+    this.set("votingEnds", Value.fromBigInt(BigInt.zero()));
+    this.set("graceEnds", Value.fromBigInt(BigInt.zero()));
+    this.set("proposalData", Value.fromBytes(Bytes.empty()));
+    this.set("expiration", Value.fromBigInt(BigInt.zero()));
+    this.set("details", Value.fromString(""));
+    this.set("selfSponsor", Value.fromBoolean(false));
+    this.set("sponsored", Value.fromBoolean(false));
+    this.set("cancelled", Value.fromBoolean(false));
+    this.set("processed", Value.fromBoolean(false));
+    this.set("sponsor", Value.fromBytes(Bytes.empty()));
+    this.set("actionFailed", Value.fromBoolean(false));
+    this.set("passed", Value.fromBoolean(false));
+    this.set("proposalOffering", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Proposal entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Proposal entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Proposal", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Proposal | null {
+    return changetype<Proposal | null>(store.get("Proposal", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value!.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
+
+  get createdBy(): Bytes {
+    let value = this.get("createdBy");
+    return value!.toBytes();
+  }
+
+  set createdBy(value: Bytes) {
+    this.set("createdBy", Value.fromBytes(value));
+  }
+
+  get dao(): string {
+    let value = this.get("dao");
+    return value!.toString();
+  }
+
+  set dao(value: string) {
+    this.set("dao", Value.fromString(value));
+  }
+
+  get proposalId(): BigInt {
+    let value = this.get("proposalId");
+    return value!.toBigInt();
+  }
+
+  set proposalId(value: BigInt) {
+    this.set("proposalId", Value.fromBigInt(value));
+  }
+
+  get prevProposalId(): BigInt {
+    let value = this.get("prevProposalId");
+    return value!.toBigInt();
+  }
+
+  set prevProposalId(value: BigInt) {
+    this.set("prevProposalId", Value.fromBigInt(value));
+  }
+
+  get proposalDataHash(): Bytes {
+    let value = this.get("proposalDataHash");
+    return value!.toBytes();
+  }
+
+  set proposalDataHash(value: Bytes) {
+    this.set("proposalDataHash", Value.fromBytes(value));
+  }
+
+  get votingPeriod(): BigInt {
+    let value = this.get("votingPeriod");
+    return value!.toBigInt();
+  }
+
+  set votingPeriod(value: BigInt) {
+    this.set("votingPeriod", Value.fromBigInt(value));
+  }
+
+  get votingStarts(): BigInt {
+    let value = this.get("votingStarts");
+    return value!.toBigInt();
+  }
+
+  set votingStarts(value: BigInt) {
+    this.set("votingStarts", Value.fromBigInt(value));
+  }
+
+  get votingEnds(): BigInt {
+    let value = this.get("votingEnds");
+    return value!.toBigInt();
+  }
+
+  set votingEnds(value: BigInt) {
+    this.set("votingEnds", Value.fromBigInt(value));
+  }
+
+  get graceEnds(): BigInt {
+    let value = this.get("graceEnds");
+    return value!.toBigInt();
+  }
+
+  set graceEnds(value: BigInt) {
+    this.set("graceEnds", Value.fromBigInt(value));
+  }
+
+  get proposalData(): Bytes {
+    let value = this.get("proposalData");
+    return value!.toBytes();
+  }
+
+  set proposalData(value: Bytes) {
+    this.set("proposalData", Value.fromBytes(value));
+  }
+
+  get expiration(): BigInt {
+    let value = this.get("expiration");
+    return value!.toBigInt();
+  }
+
+  set expiration(value: BigInt) {
+    this.set("expiration", Value.fromBigInt(value));
+  }
+
+  get details(): string {
+    let value = this.get("details");
+    return value!.toString();
+  }
+
+  set details(value: string) {
+    this.set("details", Value.fromString(value));
+  }
+
+  get selfSponsor(): boolean {
+    let value = this.get("selfSponsor");
+    return value!.toBoolean();
+  }
+
+  set selfSponsor(value: boolean) {
+    this.set("selfSponsor", Value.fromBoolean(value));
+  }
+
+  get sponsored(): boolean {
+    let value = this.get("sponsored");
+    return value!.toBoolean();
+  }
+
+  set sponsored(value: boolean) {
+    this.set("sponsored", Value.fromBoolean(value));
+  }
+
+  get cancelled(): boolean {
+    let value = this.get("cancelled");
+    return value!.toBoolean();
+  }
+
+  set cancelled(value: boolean) {
+    this.set("cancelled", Value.fromBoolean(value));
+  }
+
+  get processed(): boolean {
+    let value = this.get("processed");
+    return value!.toBoolean();
+  }
+
+  set processed(value: boolean) {
+    this.set("processed", Value.fromBoolean(value));
+  }
+
+  get sponsor(): Bytes {
+    let value = this.get("sponsor");
+    return value!.toBytes();
+  }
+
+  set sponsor(value: Bytes) {
+    this.set("sponsor", Value.fromBytes(value));
+  }
+
+  get actionFailed(): boolean {
+    let value = this.get("actionFailed");
+    return value!.toBoolean();
+  }
+
+  set actionFailed(value: boolean) {
+    this.set("actionFailed", Value.fromBoolean(value));
+  }
+
+  get passed(): boolean {
+    let value = this.get("passed");
+    return value!.toBoolean();
+  }
+
+  set passed(value: boolean) {
+    this.set("passed", Value.fromBoolean(value));
+  }
+
+  get proposalOffering(): BigInt {
+    let value = this.get("proposalOffering");
+    return value!.toBigInt();
+  }
+
+  set proposalOffering(value: BigInt) {
+    this.set("proposalOffering", Value.fromBigInt(value));
   }
 }
 
@@ -383,6 +612,7 @@ export class Member extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("createdAt", Value.fromString(""));
+    this.set("dao", Value.fromString(""));
     this.set("memberAddress", Value.fromBytes(Bytes.empty()));
     this.set("shares", Value.fromBigInt(BigInt.zero()));
     this.set("loot", Value.fromBigInt(BigInt.zero()));
@@ -423,21 +653,13 @@ export class Member extends Entity {
     this.set("createdAt", Value.fromString(value));
   }
 
-  get dao(): string | null {
+  get dao(): string {
     let value = this.get("dao");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value!.toString();
   }
 
-  set dao(value: string | null) {
-    if (!value) {
-      this.unset("dao");
-    } else {
-      this.set("dao", Value.fromString(<string>value));
-    }
+  set dao(value: string) {
+    this.set("dao", Value.fromString(value));
   }
 
   get memberAddress(): Bytes {
@@ -465,6 +687,80 @@ export class Member extends Entity {
 
   set loot(value: BigInt) {
     this.set("loot", Value.fromBigInt(value));
+  }
+}
+
+export class Shaman extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("createdAt", Value.fromString(""));
+    this.set("dao", Value.fromString(""));
+    this.set("shamanAddress", Value.fromBytes(Bytes.empty()));
+    this.set("permissions", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Shaman entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Shaman entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Shaman", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Shaman | null {
+    return changetype<Shaman | null>(store.get("Shaman", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value!.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
+
+  get dao(): string {
+    let value = this.get("dao");
+    return value!.toString();
+  }
+
+  set dao(value: string) {
+    this.set("dao", Value.fromString(value));
+  }
+
+  get shamanAddress(): Bytes {
+    let value = this.get("shamanAddress");
+    return value!.toBytes();
+  }
+
+  set shamanAddress(value: Bytes) {
+    this.set("shamanAddress", Value.fromBytes(value));
+  }
+
+  get permissions(): BigInt {
+    let value = this.get("permissions");
+    return value!.toBigInt();
+  }
+
+  set permissions(value: BigInt) {
+    this.set("permissions", Value.fromBigInt(value));
   }
 }
 

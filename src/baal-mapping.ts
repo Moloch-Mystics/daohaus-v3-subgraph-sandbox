@@ -1,8 +1,17 @@
 import { BigInt, log } from "@graphprotocol/graph-ts";
-import { Dao, Member } from "../generated/schema";
+import { Dao, Member, Proposal, Shaman } from "../generated/schema";
 
 import {
+  CancelProposal,
+  GovernanceConfigSet,
+  LootPaused,
+  ProcessingFailed,
+  ProcessProposal,
   SetupComplete,
+  ShamanSet,
+  SharesPaused,
+  SponsorProposal,
+  SubmitProposal,
   Transfer,
   TransferLoot,
 } from "../generated/templates/BaalTemplate/Baal";
@@ -115,10 +124,10 @@ export function handleTransfer(event: Transfer): void {
 
   //if from zero address it mints to a member
   if (event.params.from.toHexString() === constants.ADDRESS_ZERO) {
-    let memberId = event.params.from
+    let memberId = event.address
       .toHexString()
       .concat("-member-")
-      .concat(event.address.toHexString());
+      .concat(event.params.from.toHexString());
 
     mintShares(event, dao, memberId);
     return;
@@ -126,25 +135,25 @@ export function handleTransfer(event: Transfer): void {
 
   //if to baal it burns from member
   if (event.params.to === event.address) {
-    let memberId = event.params.from
+    let memberId = event.address
       .toHexString()
       .concat("-member-")
-      .concat(event.address.toHexString());
+      .concat(event.params.from.toHexString());
 
     burnShares(event, dao, memberId);
     return;
   }
 
   //if member to member it transfers (add/subtract)
-  let burnMemberId = event.params.from
+  let burnMemberId = event.address
     .toHexString()
     .concat("-member-")
-    .concat(event.address.toHexString());
+    .concat(event.params.from.toHexString());
 
-  let mintMemberId = event.params.to
+  let mintMemberId = event.address
     .toHexString()
     .concat("-member-")
-    .concat(event.address.toHexString());
+    .concat(event.params.to.toHexString());
 
   burnShares(event, dao, burnMemberId);
   mintShares(event, dao, mintMemberId);
@@ -167,10 +176,10 @@ export function handleTransferLoot(event: TransferLoot): void {
 
   //if from zero address it mints to a member
   if (event.params.from.toHexString() === constants.ADDRESS_ZERO) {
-    let memberId = event.params.from
+    let memberId = event.address
       .toHexString()
       .concat("-member-")
-      .concat(event.address.toHexString());
+      .concat(event.params.from.toHexString());
 
     mintLoot(event, dao, memberId);
     return;
@@ -178,25 +187,25 @@ export function handleTransferLoot(event: TransferLoot): void {
 
   //if to baal it burns from member
   if (event.params.to === event.address) {
-    let memberId = event.params.from
+    let memberId = event.address
       .toHexString()
       .concat("-member-")
-      .concat(event.address.toHexString());
+      .concat(event.params.from.toHexString());
 
     burnLoot(event, dao, memberId);
     return;
   }
 
   //if member to member it transfers (add/subtract)
-  let burnMemberId = event.params.from
+  let burnMemberId = event.address
     .toHexString()
     .concat("-member-")
-    .concat(event.address.toHexString());
+    .concat(event.params.from.toHexString());
 
-  let mintMemberId = event.params.to
+  let mintMemberId = event.address
     .toHexString()
     .concat("-member-")
-    .concat(event.address.toHexString());
+    .concat(event.params.to.toHexString());
 
   burnLoot(event, dao, burnMemberId);
   mintLoot(event, dao, mintMemberId);
@@ -204,10 +213,213 @@ export function handleTransferLoot(event: TransferLoot): void {
   addTransaction(event.block, event.transaction);
 }
 
-// DelegateVotesChanged (index_topic_1 address delegate, uint256 previousBalance, uint256 newBalance)
-// ShamanSet (index_topic_1 address shaman, uint256 permission)
 // GovernanceConfigSet (uint32 voting, uint32 grace, uint256 newOffering, uint256 quorum, uint256 sponsor, uint256 minRetention)
-// LootPaused (bool paused)
-// SharesPaused (bool paused)
-// OwnershipTransferred (index_topic_1 address previousOwner, index_topic_2 address newOwner)
-// why twice - once from summoner to safe and once from 0x0 to safe
+export function handleGovernanceConfigSet(event: GovernanceConfigSet): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  dao.votingPeriod = event.params.voting;
+  dao.gracePeriod = event.params.grace;
+  dao.proposalOffering = event.params.newOffering;
+  dao.quorumPercent = event.params.quorum;
+  dao.sponsorThreshold = event.params.sponsor;
+  dao.minRetentionPercent = event.params.minRetention;
+
+  dao.save();
+}
+
+// ShamanSet (index_topic_1 address shaman, uint256 permission)
+export function handleShamanSet(event: ShamanSet): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  let shamanId = event.address
+    .toHexString()
+    .concat("-shaman-")
+    .concat(event.params.shaman.toHexString());
+
+  let shaman = Shaman.load(shamanId);
+  if (shaman === null) {
+    shaman = new Shaman(shamanId);
+    shaman.createdAt = event.block.timestamp.toString();
+    shaman.dao = event.address.toHexString();
+    shaman.shamanAddress = event.params.shaman;
+  }
+
+  shaman.permissions = event.params.permission;
+
+  shaman.save();
+}
+
+export function handleSharesPaused(event: SharesPaused): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  dao.sharesPaused = event.params.paused;
+
+  dao.save();
+}
+
+export function handleLootPaused(event: LootPaused): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  dao.lootPaused = event.params.paused;
+
+  dao.save();
+}
+
+export function handleSubmitProposal(event: SubmitProposal): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  let proposalId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toString());
+
+  let proposal = new Proposal(proposalId);
+  proposal.createdAt = event.block.timestamp.toString();
+  proposal.createdBy = event.transaction.from;
+  proposal.proposalId = event.params.proposal;
+  proposal.proposalDataHash = event.params.proposalDataHash;
+  proposal.proposalData = event.params.proposalData;
+  proposal.votingPeriod = event.params.votingPeriod;
+  proposal.expiration = event.params.expiration;
+  proposal.sponsored = event.params.selfSponsor;
+  proposal.details = event.params.details;
+  proposal.cancelled = false;
+  proposal.processed = false;
+  proposal.actionFailed = false;
+  proposal.passed = false;
+  proposal.proposalOffering = event.transaction.value;
+
+  proposal.selfSponsor = event.params.selfSponsor;
+  proposal.prevProposalId = event.params.selfSponsor
+    ? dao.latestSponsoredProposalId
+    : constants.BIGINT_ZERO;
+  proposal.prevProposalId = constants.BIGINT_ZERO;
+  proposal.votingStarts = event.params.selfSponsor
+    ? event.block.timestamp
+    : constants.BIGINT_ZERO;
+  proposal.votingEnds = event.params.selfSponsor
+    ? event.block.timestamp.plus(event.params.votingPeriod)
+    : constants.BIGINT_ZERO;
+  proposal.graceEnds = event.params.selfSponsor
+    ? event.block.timestamp
+        .plus(event.params.votingPeriod)
+        .plus(dao.gracePeriod)
+    : constants.BIGINT_ZERO;
+
+  proposal.save();
+
+  if (event.params.selfSponsor) {
+    dao.latestSponsoredProposalId = event.params.proposal;
+
+    dao.save();
+  }
+}
+
+export function handleSponsorProposal(event: SponsorProposal): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  let proposalId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toString());
+
+  let proposal = Proposal.load(proposalId);
+  if (proposal === null) {
+    return;
+  }
+
+  proposal.sponsor = event.params.member;
+  proposal.sponsored = true;
+  proposal.votingStarts = event.block.timestamp;
+  proposal.votingEnds = event.block.timestamp.plus(dao.votingPeriod);
+  proposal.graceEnds = event.block.timestamp
+    .plus(dao.votingPeriod)
+    .plus(dao.gracePeriod);
+  proposal.prevProposalId = dao.latestSponsoredProposalId;
+
+  dao.latestSponsoredProposalId = event.params.proposal;
+
+  proposal.save();
+  dao.save();
+}
+
+export function handleProcessProposal(event: ProcessProposal): void {
+  let proposalId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toString());
+
+  let proposal = Proposal.load(proposalId);
+  if (proposal === null) {
+    return;
+  }
+
+  proposal.processed = true;
+  proposal.passed = event.params.passed;
+  proposal.actionFailed = event.params.actionFailed;
+
+  proposal.save();
+}
+
+// why do we need this when the above event emit it too?
+export function handleProcessingFailed(event: ProcessingFailed): void {
+  let proposalId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toString());
+
+  let proposal = Proposal.load(proposalId);
+  if (proposal === null) {
+    return;
+  }
+
+  proposal.actionFailed = true;
+
+  proposal.save();
+}
+
+export function handleCancelProposal(event: CancelProposal): void {
+  let proposalId = event.address
+    .toHexString()
+    .concat("-proposal-")
+    .concat(event.params.proposal.toString());
+
+  let proposal = Proposal.load(proposalId);
+  if (proposal === null) {
+    return;
+  }
+
+  proposal.cancelled = true;
+
+  proposal.save();
+}
+
+// - Approval(indexed address,indexed address,uint256)
+// - AvatarSet(indexed address,indexed address)
+// - ChangedGuard(address)
+// - DelegateChanged(indexed address,indexed address,indexed address)
+// - DelegateVotesChanged(indexed address,uint256,uint256)
+// - Ragequit(indexed address,address,indexed uint256,indexed uint256,address[])
+// - SubmitVote(indexed address,uint256,indexed uint256,indexed bool)
+// - TargetSet(indexed address,indexed address)
+
+// - OwnershipTransferred(indexed address,indexed address)
+// why twice on summon - once from summoner to safe and once from 0x0 to safe

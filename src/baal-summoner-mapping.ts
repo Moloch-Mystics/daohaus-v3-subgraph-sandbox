@@ -10,9 +10,7 @@ export function handleSummonBaal(event: SummonBaal): void {
   BaalTemplate.create(event.params.baal);
 
   let daoId = event.params.baal.toHexString();
-
   let dao = new Dao(daoId);
-
   if (dao === null) {
     return;
   }
@@ -23,6 +21,15 @@ export function handleSummonBaal(event: SummonBaal): void {
   dao.safeAddress = event.params.safe;
   dao.totalShares = constants.BIGINT_ZERO;
   dao.totalLoot = constants.BIGINT_ZERO;
+  dao.latestSponsoredProposalId = constants.BIGINT_ZERO;
+  dao.lootPaused = false;
+  dao.sharesPaused = false;
+  dao.gracePeriod = constants.BIGINT_ZERO;
+  dao.votingPeriod = constants.BIGINT_ZERO;
+  dao.proposalOffering = constants.BIGINT_ZERO;
+  dao.quorumPercent = constants.BIGINT_ZERO;
+  dao.sponsorThreshold = constants.BIGINT_ZERO;
+  dao.minRetentionPercent = constants.BIGINT_ZERO;
 
   dao.save();
 

@@ -4,19 +4,46 @@ type Dao @entity {
   transactionHashSummon: Bytes!
   lootAddress: Bytes!
   safeAddress: Bytes!
-  lootPaused: Boolean
-  sharesPaused: Boolean
-  gracePeriod: BigInt
-  votingPeriod: BigInt
-  proposalOffering: BigInt
-  quorumPercent: BigInt
-  sponsorThreshold: BigInt
-  minRetentionPercent: BigInt
+  lootPaused: Boolean!
+  sharesPaused: Boolean!
+  gracePeriod: BigInt!
+  votingPeriod: BigInt!
+  proposalOffering: BigInt!
+  quorumPercent: BigInt!
+  sponsorThreshold: BigInt!
+  minRetentionPercent: BigInt!
   shareTokenName: String
   shareTokenSymbol: String
   totalShares: BigInt!
   totalLoot: BigInt!
+  latestSponsoredProposalId: BigInt!
+  members: [Member!] @derivedFrom(field: "dao")
   metaData: MetaData @derivedFrom(field: "dao")
+}
+
+type Proposal @entity {
+  id: ID!
+  createdAt: String!
+  createdBy: Bytes!
+  dao: Dao!
+  proposalId: BigInt!
+  prevProposalId: BigInt!
+  proposalDataHash: Bytes!
+  votingPeriod: BigInt!
+  votingStarts: BigInt!
+  votingEnds: BigInt!
+  graceEnds: BigInt!
+  proposalData: Bytes!
+  expiration: BigInt!
+  details: String!
+  selfSponsor: Boolean!
+  sponsored: Boolean!
+  cancelled: Boolean!
+  processed: Boolean!
+  sponsor: Bytes!
+  actionFailed: Boolean!
+  passed: Boolean!
+  proposalOffering: BigInt!
 }
 
 type MetaData @entity {
@@ -35,6 +62,14 @@ type Member @entity {
   memberAddress: Bytes!
   shares: BigInt!
   loot: BigInt!
+}
+
+type Shaman @entity {
+  id: ID!
+  createdAt: String!
+  dao: Dao!
+  shamanAddress: Bytes!
+  permissions: BigInt!
 }
 
 type EventTransaction @entity {
