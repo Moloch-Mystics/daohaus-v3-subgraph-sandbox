@@ -291,6 +291,7 @@ export function handleSubmitProposal(event: SubmitProposal): void {
   let proposal = new Proposal(proposalId);
   proposal.createdAt = event.block.timestamp.toString();
   proposal.createdBy = event.transaction.from;
+  proposal.dao = event.address.toHexString();
   proposal.proposalId = event.params.proposal;
   proposal.proposalDataHash = event.params.proposalDataHash;
   proposal.proposalData = event.params.proposalData;
@@ -305,6 +306,9 @@ export function handleSubmitProposal(event: SubmitProposal): void {
   proposal.proposalOffering = event.transaction.value;
 
   proposal.selfSponsor = event.params.selfSponsor;
+  // proposal.sponsor = event.params.selfSponsor
+  //   ? event.transaction.from
+  //   : constants.ADDRESS_ZERO;
   proposal.prevProposalId = event.params.selfSponsor
     ? dao.latestSponsoredProposalId
     : constants.BIGINT_ZERO;

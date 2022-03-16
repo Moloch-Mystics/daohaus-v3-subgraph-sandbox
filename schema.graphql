@@ -17,6 +17,7 @@ type Dao @entity {
   totalShares: BigInt!
   totalLoot: BigInt!
   latestSponsoredProposalId: BigInt!
+  proposals: [Proposal!] @derivedFrom(field: "dao")
   members: [Member!] @derivedFrom(field: "dao")
   metaData: MetaData @derivedFrom(field: "dao")
 }

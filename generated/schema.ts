@@ -229,6 +229,23 @@ export class Dao extends Entity {
     this.set("latestSponsoredProposalId", Value.fromBigInt(value));
   }
 
+  get proposals(): Array<string> | null {
+    let value = this.get("proposals");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set proposals(value: Array<string> | null) {
+    if (!value) {
+      this.unset("proposals");
+    } else {
+      this.set("proposals", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
   get members(): Array<string> | null {
     let value = this.get("members");
     if (!value || value.kind == ValueKind.NULL) {
