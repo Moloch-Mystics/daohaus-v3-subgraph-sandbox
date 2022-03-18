@@ -79,6 +79,8 @@ type Member @entity {
   memberAddress: Bytes!
   shares: BigInt!
   loot: BigInt!
+  delegatingTo: Bytes!
+  delegateShares: BigInt!
   votes: [Vote!] @derivedFrom(field: "member")
 }
 

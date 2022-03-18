@@ -51,6 +51,7 @@ function mintShares(event: Transfer, dao: Dao, memberId: string): void {
     member.createdAt = event.block.timestamp.toString();
     member.dao = event.address.toHexString();
     member.memberAddress = event.params.to;
+    member.delegatingTo = event.params.to;
     member.shares = constants.BIGINT_ZERO;
     member.loot = constants.BIGINT_ZERO;
   }
@@ -84,6 +85,7 @@ function mintLoot(event: TransferLoot, dao: Dao, memberId: string): void {
     member.createdAt = event.block.timestamp.toString();
     member.dao = event.address.toHexString();
     member.memberAddress = event.params.to;
+    member.delegatingTo = event.params.to;
     member.shares = constants.BIGINT_ZERO;
     member.loot = constants.BIGINT_ZERO;
   }
@@ -526,7 +528,8 @@ export function handleDelegateChanged(event: DelegateChanged): void {
   let member = Member.load(memberId);
 
   if (member === null) {
-    log.info("handleDelegateChanged no member: {}", [memberId]);
+    log.info("handleDelegateChanged no delegator member: {}", [memberId]);
+    return;
   }
 
   member.delegatingTo = event.params.toDelegate;
@@ -546,6 +549,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
     member.createdAt = event.block.timestamp.toString();
     member.dao = event.address.toHexString();
     member.memberAddress = event.params.delegate;
+    member.delegatingTo = event.params.delegate;
     member.shares = constants.BIGINT_ZERO;
     member.loot = constants.BIGINT_ZERO;
   }
