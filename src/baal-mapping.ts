@@ -1,12 +1,22 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
-import { Dao, Member, Proposal, Shaman, Vote } from "../generated/schema";
+import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  Dao,
+  Member,
+  Proposal,
+  RageQuit,
+  Shaman,
+  Vote,
+} from "../generated/schema";
 
 import {
   CancelProposal,
+  DelegateChanged,
+  DelegateVotesChanged,
   GovernanceConfigSet,
   LootPaused,
   ProcessingFailed,
   ProcessProposal,
+  Ragequit,
   SetupComplete,
   ShamanSet,
   SharesPaused,
@@ -19,14 +29,14 @@ import {
 import { constants } from "./util/constants";
 import { addTransaction } from "./util/transactions";
 
-function burnShares(event: Transfer, dao: Dao, memberId: string): void {
+function burnShares(dao: Dao, memberId: string, amount: BigInt): void {
   let member = Member.load(memberId);
 
   if (member === null) {
     log.info("burn member not found", []);
   } else {
-    member.shares = member.shares.minus(event.params.amount);
-    dao.totalShares = dao.totalShares.minus(event.params.amount);
+    member.shares = member.shares.minus(amount);
+    dao.totalShares = dao.totalShares.minus(amount);
 
     member.save();
     dao.save();
@@ -52,14 +62,14 @@ function mintShares(event: Transfer, dao: Dao, memberId: string): void {
   dao.save();
 }
 
-function burnLoot(event: TransferLoot, dao: Dao, memberId: string): void {
+function burnLoot(dao: Dao, memberId: string, amount: BigInt): void {
   let member = Member.load(memberId);
 
   if (member === null) {
-    log.info("burn member not found", []);
+    log.info("burn member not found, {}", [memberId]);
   } else {
-    member.loot = member.loot.minus(event.params.amount);
-    dao.totalLoot = dao.totalLoot.minus(event.params.amount);
+    member.loot = member.loot.minus(amount);
+    dao.totalLoot = dao.totalLoot.minus(amount);
 
     member.save();
     dao.save();
@@ -141,7 +151,7 @@ export function handleTransfer(event: Transfer): void {
       .concat("-member-")
       .concat(event.params.from.toHexString());
 
-    burnShares(event, dao, memberId);
+    burnShares(dao, memberId, event.params.amount);
     return;
   }
 
@@ -156,7 +166,7 @@ export function handleTransfer(event: Transfer): void {
     .concat("-member-")
     .concat(event.params.to.toHexString());
 
-  burnShares(event, dao, burnMemberId);
+  burnShares(dao, burnMemberId, event.params.amount);
   mintShares(event, dao, mintMemberId);
 
   addTransaction(event.block, event.transaction);
@@ -193,7 +203,7 @@ export function handleTransferLoot(event: TransferLoot): void {
       .concat("-member-")
       .concat(event.params.from.toHexString());
 
-    burnLoot(event, dao, memberId);
+    burnLoot(dao, memberId, event.params.amount);
     return;
   }
 
@@ -208,7 +218,7 @@ export function handleTransferLoot(event: TransferLoot): void {
     .concat("-member-")
     .concat(event.params.to.toHexString());
 
-  burnLoot(event, dao, burnMemberId);
+  burnLoot(dao, burnMemberId, event.params.amount);
   mintLoot(event, dao, mintMemberId);
 
   addTransaction(event.block, event.transaction);
@@ -470,12 +480,95 @@ export function handleSubmitVote(event: SubmitVote): void {
   proposal.save();
 }
 
-// - Approval(indexed address,indexed address,uint256)
+export function handleRageQuit(event: Ragequit): void {
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  let memberId = event.address
+    .toHexString()
+    .concat("-member-")
+    .concat(event.params.member.toHexString());
+
+  if (event.params.lootToBurn !== constants.BIGINT_ZERO) {
+    burnLoot(dao, memberId, event.params.lootToBurn);
+  }
+
+  if (event.params.sharesToBurn !== constants.BIGINT_ZERO) {
+    burnShares(dao, memberId, event.params.sharesToBurn);
+  }
+
+  let rageId = memberId
+    .concat("-")
+    .concat("rage-")
+    .concat(event.transaction.hash.toHexString());
+
+  let rage = new RageQuit(rageId);
+
+  rage.createdAt = event.block.timestamp.toString();
+  rage.dao = dao.id;
+  rage.member = memberId;
+  rage.to = event.params.to;
+  rage.shares = event.params.sharesToBurn;
+  rage.loot = event.params.lootToBurn;
+  rage.tokens = event.params.tokens.map<Bytes>((a) => a as Bytes);
+
+  rage.save();
+}
+
+export function handleDelegateChanged(event: DelegateChanged): void {
+  let memberId = event.address
+    .toHexString()
+    .concat("-member-")
+    .concat(event.params.delegator.toHexString());
+
+  let member = Member.load(memberId);
+
+  if (member === null) {
+    log.info("handleDelegateChanged no member: {}", [memberId]);
+  }
+
+  member.delegatingTo = event.params.toDelegate;
+
+  member.save();
+}
+
+export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
+  let memberId = event.address
+    .toHexString()
+    .concat("-member-")
+    .concat(event.params.delegate.toHexString());
+  let member = Member.load(memberId);
+
+  if (member === null) {
+    member = new Member(memberId);
+    member.createdAt = event.block.timestamp.toString();
+    member.dao = event.address.toHexString();
+    member.memberAddress = event.params.delegate;
+    member.shares = constants.BIGINT_ZERO;
+    member.loot = constants.BIGINT_ZERO;
+  }
+
+  member.delegateShares = event.params.newBalance;
+
+  member.save();
+}
+
+// - DelegateChanged(indexed address,indexed address,indexed address)
+//// record who the member is delegating too (delegatingTo)
+
+// - DelegateVotesChanged(indexed address,uint256,uint256)
+//// create/load delegate member
+//// update newBalance (delegateShares)
+
+//// non active member has zero share/loot AND delegateShares
+
+// gnosis events
 // - AvatarSet(indexed address,indexed address)
 // - ChangedGuard(address)
-// - DelegateChanged(indexed address,indexed address,indexed address)
-// - DelegateVotesChanged(indexed address,uint256,uint256)
-// - Ragequit(indexed address,address,indexed uint256,indexed uint256,address[])
-// - TargetSet(indexed address,indexed address)
 // - OwnershipTransferred(indexed address,indexed address)
-// why twice on summon - once from summoner to safe and once from 0x0 to safe
+// - TargetSet(indexed address,indexed address)
+
+// standard erc20 event - no current need to map
+// - Approval(indexed address,indexed address,uint256)

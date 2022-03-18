@@ -794,6 +794,8 @@ export class Member extends Entity {
     this.set("memberAddress", Value.fromBytes(Bytes.empty()));
     this.set("shares", Value.fromBigInt(BigInt.zero()));
     this.set("loot", Value.fromBigInt(BigInt.zero()));
+    this.set("delegatingTo", Value.fromBytes(Bytes.empty()));
+    this.set("delegateShares", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -867,6 +869,24 @@ export class Member extends Entity {
     this.set("loot", Value.fromBigInt(value));
   }
 
+  get delegatingTo(): Bytes {
+    let value = this.get("delegatingTo");
+    return value!.toBytes();
+  }
+
+  set delegatingTo(value: Bytes) {
+    this.set("delegatingTo", Value.fromBytes(value));
+  }
+
+  get delegateShares(): BigInt {
+    let value = this.get("delegateShares");
+    return value!.toBigInt();
+  }
+
+  set delegateShares(value: BigInt) {
+    this.set("delegateShares", Value.fromBigInt(value));
+  }
+
   get votes(): Array<string> | null {
     let value = this.get("votes");
     if (!value || value.kind == ValueKind.NULL) {
@@ -882,6 +902,110 @@ export class Member extends Entity {
     } else {
       this.set("votes", Value.fromStringArray(<Array<string>>value));
     }
+  }
+}
+
+export class RageQuit extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("createdAt", Value.fromString(""));
+    this.set("dao", Value.fromString(""));
+    this.set("member", Value.fromString(""));
+    this.set("to", Value.fromBytes(Bytes.empty()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
+    this.set("loot", Value.fromBigInt(BigInt.zero()));
+    this.set("tokens", Value.fromBytesArray(new Array(0)));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save RageQuit entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save RageQuit entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("RageQuit", id.toString(), this);
+    }
+  }
+
+  static load(id: string): RageQuit | null {
+    return changetype<RageQuit | null>(store.get("RageQuit", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value!.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
+
+  get dao(): string {
+    let value = this.get("dao");
+    return value!.toString();
+  }
+
+  set dao(value: string) {
+    this.set("dao", Value.fromString(value));
+  }
+
+  get member(): string {
+    let value = this.get("member");
+    return value!.toString();
+  }
+
+  set member(value: string) {
+    this.set("member", Value.fromString(value));
+  }
+
+  get to(): Bytes {
+    let value = this.get("to");
+    return value!.toBytes();
+  }
+
+  set to(value: Bytes) {
+    this.set("to", Value.fromBytes(value));
+  }
+
+  get shares(): BigInt {
+    let value = this.get("shares");
+    return value!.toBigInt();
+  }
+
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
+  }
+
+  get loot(): BigInt {
+    let value = this.get("loot");
+    return value!.toBigInt();
+  }
+
+  set loot(value: BigInt) {
+    this.set("loot", Value.fromBigInt(value));
+  }
+
+  get tokens(): Array<Bytes> {
+    let value = this.get("tokens");
+    return value!.toBytesArray();
+  }
+
+  set tokens(value: Array<Bytes>) {
+    this.set("tokens", Value.fromBytesArray(value));
   }
 }
 

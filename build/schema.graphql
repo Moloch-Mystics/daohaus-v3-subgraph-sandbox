@@ -82,6 +82,17 @@ type Member @entity {
   votes: [Vote!] @derivedFrom(field: "member")
 }
 
+type RageQuit @entity {
+  id: ID!
+  createdAt: String!
+  dao: Dao!
+  member: Member!
+  to: Bytes!
+  shares: BigInt!
+  loot: BigInt!
+  tokens: [Bytes!]!
+}
+
 type Shaman @entity {
   id: ID!
   createdAt: String!

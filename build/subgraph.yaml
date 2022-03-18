@@ -89,3 +89,5 @@ templates:
           handler: handleCancelProposal
         - event: SubmitVote(indexed address,uint256,indexed uint256,indexed bool)
           handler: handleSubmitVote
+        - event: Ragequit(indexed address,address,indexed uint256,indexed uint256,address[])
+          handler: handleRageQuit
