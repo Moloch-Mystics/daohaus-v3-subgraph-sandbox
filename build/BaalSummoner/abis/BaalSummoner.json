@@ -20,11 +20,6 @@
         "internalType": "address",
         "name": "_gnosisMultisendLibrary",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_poster",
-        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -169,40 +164,9 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "_details",
-        "type": "string"
-      }
-    ],
-    "name": "postMetadata",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "poster",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_safe",
         "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "_details",
-        "type": "string"
       }
     ],
     "name": "summonBaal",
@@ -232,11 +196,6 @@
         "internalType": "uint256",
         "name": "_saltNonce",
         "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "_details",
-        "type": "string"
       }
     ],
     "name": "summonBaalAndSafe",

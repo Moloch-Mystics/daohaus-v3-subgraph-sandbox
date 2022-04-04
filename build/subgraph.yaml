@@ -8,9 +8,9 @@ dataSources:
     name: BaalSummoner
     network: rinkeby
     source:
-      address: "0x1b94221EB2bC8dc9F16660EA5be9dcd92b0ae862"
+      address: "0x31C948A5Ad149853B211de025082b61573ef3979"
       abi: BaalSummoner
-      startBlock: 10294289
+      startBlock: 10305239
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -43,3 +43,34 @@ templates:
       eventHandlers:
         - event: SetupComplete(bool,bool,uint32,uint32,uint256,uint256,uint256,uint256,string,string,uint256,uint256)
           handler: handleSetupComplete
+        - event: GovernanceConfigSet(uint32,uint32,uint256,uint256,uint256,uint256)
+          handler: handleGovernanceConfigSet
+        - event: ShamanSet(indexed address,uint256)
+          handler: handleShamanSet
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: TransferLoot(indexed address,indexed address,uint256)
+          handler: handleTransferLoot
+        - event: LootPaused(bool)
+          handler: handleLootPaused
+        - event: SharesPaused(bool)
+          handler: handleSharesPaused
+        - event: SubmitProposal(indexed uint256,indexed
+            bytes32,uint256,bytes,uint256,bool,uint256,string)
+          handler: handleSubmitProposal
+        - event: SponsorProposal(indexed address,indexed uint256,indexed uint256)
+          handler: handleSponsorProposal
+        - event: ProcessProposal(indexed uint256,bool,bool)
+          handler: handleProcessProposal
+        - event: ProcessingFailed(indexed uint256)
+          handler: handleProcessingFailed
+        - event: CancelProposal(indexed uint256)
+          handler: handleCancelProposal
+        - event: SubmitVote(indexed address,uint256,indexed uint256,indexed bool)
+          handler: handleSubmitVote
+        - event: Ragequit(indexed address,address,indexed uint256,indexed uint256,address[])
+          handler: handleRageQuit
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged

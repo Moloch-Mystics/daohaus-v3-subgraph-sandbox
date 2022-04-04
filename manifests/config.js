@@ -1,42 +1,42 @@
 module.exports.config = {
   mainnet: {
     dataSources: [],
-    templates: [],
+    templates: []
   },
   "arbitrum-one": {
     dataSources: [],
-    templates: [],
+    templates: []
   },
   celo: {
     dataSources: [],
-    templates: [],
+    templates: []
   },
   kovan: {
     dataSources: [],
-    templates: [],
+    templates: []
   },
   xdai: {
     dataSources: [],
-    templates: [],
+    templates: []
   },
   rinkeby: {
     dataSources: [
       {
         name: "baalSummoner",
         template: "baal-summoner-ds.yaml",
-        address: "0x1b94221EB2bC8dc9F16660EA5be9dcd92b0ae862",
-        startBlock: 10294289,
-      },
+        address: "0x31C948A5Ad149853B211de025082b61573ef3979",
+        startBlock: 10305239
+      }
     ],
     templates: [
       {
         name: "baalTemplate",
-        template: "baal-template.yaml",
-      },
-    ],
+        template: "baal-template.yaml"
+      }
+    ]
   },
   matic: {
     dataSources: [],
-    templates: [],
-  },
+    templates: []
+  }
 };

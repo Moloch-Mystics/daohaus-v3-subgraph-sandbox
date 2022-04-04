@@ -1,25 +1,18 @@
-type Dao @entity {
+type MemberUri @entity {
   id: ID!
-  createdAt: String!
-  transactionHash: Bytes!
-  daoAddress: Bytes!
-  lootAddress: Bytes!
-  safeAddress: Bytes!
-  lootPaused: Boolean
-  sharesPaused: Boolean
-  gracePeriod: BigInt
-  votingPeriod: BigInt
-  proposalOffering: BigInt
-  quorumPercent: BigInt
-  sponsorThreshold: BigInt
-  minRetentionPercent: BigInt
-  shareTokenName: String
-  shareTokenSymbol: String
-  totalShares: BigInt
-  totalLoot: BigInt
+  members: [Member!] @derivedFrom(field: "dao")
 }
 
-type EventTransaction @entity {
+
+type Member @entity {
   id: ID!
   createdAt: String!
+  dao: MemberUri!
+  memberAddress: Bytes!
+  shares: BigInt!
+  loot: BigInt!
+  delegatingTo: Bytes!
+  delegateShares: BigInt!
 }
+
+

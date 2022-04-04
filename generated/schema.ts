@@ -12,35 +12,27 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class Dao extends Entity {
+export class MemberUri extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("createdAt", Value.fromString(""));
-    this.set("transactionHash", Value.fromBytes(Bytes.empty()));
-    this.set("daoAddress", Value.fromBytes(Bytes.empty()));
-    this.set("lootAddress", Value.fromBytes(Bytes.empty()));
-    this.set("safeAddress", Value.fromBytes(Bytes.empty()));
-    this.set("lootPaused", Value.fromBoolean(false));
-    this.set("sharesPaused", Value.fromBoolean(false));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Dao entity without an ID");
+    assert(id != null, "Cannot save MemberUri entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Dao entity with non-string ID. " +
+        "Cannot save MemberUri entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Dao", id.toString(), this);
+      store.set("MemberUri", id.toString(), this);
     }
   }
 
-  static load(id: string): Dao | null {
-    return changetype<Dao | null>(store.get("Dao", id));
+  static load(id: string): MemberUri | null {
+    return changetype<MemberUri | null>(store.get("MemberUri", id));
   }
 
   get id(): string {
@@ -52,265 +44,53 @@ export class Dao extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get createdAt(): string {
-    let value = this.get("createdAt");
-    return value!.toString();
-  }
-
-  set createdAt(value: string) {
-    this.set("createdAt", Value.fromString(value));
-  }
-
-  get transactionHash(): Bytes {
-    let value = this.get("transactionHash");
-    return value!.toBytes();
-  }
-
-  set transactionHash(value: Bytes) {
-    this.set("transactionHash", Value.fromBytes(value));
-  }
-
-  get daoAddress(): Bytes {
-    let value = this.get("daoAddress");
-    return value!.toBytes();
-  }
-
-  set daoAddress(value: Bytes) {
-    this.set("daoAddress", Value.fromBytes(value));
-  }
-
-  get lootAddress(): Bytes {
-    let value = this.get("lootAddress");
-    return value!.toBytes();
-  }
-
-  set lootAddress(value: Bytes) {
-    this.set("lootAddress", Value.fromBytes(value));
-  }
-
-  get safeAddress(): Bytes {
-    let value = this.get("safeAddress");
-    return value!.toBytes();
-  }
-
-  set safeAddress(value: Bytes) {
-    this.set("safeAddress", Value.fromBytes(value));
-  }
-
-  get lootPaused(): boolean {
-    let value = this.get("lootPaused");
-    return value!.toBoolean();
-  }
-
-  set lootPaused(value: boolean) {
-    this.set("lootPaused", Value.fromBoolean(value));
-  }
-
-  get sharesPaused(): boolean {
-    let value = this.get("sharesPaused");
-    return value!.toBoolean();
-  }
-
-  set sharesPaused(value: boolean) {
-    this.set("sharesPaused", Value.fromBoolean(value));
-  }
-
-  get gracePeriod(): BigInt | null {
-    let value = this.get("gracePeriod");
+  get members(): Array<string> | null {
+    let value = this.get("members");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBigInt();
+      return value.toStringArray();
     }
   }
 
-  set gracePeriod(value: BigInt | null) {
+  set members(value: Array<string> | null) {
     if (!value) {
-      this.unset("gracePeriod");
+      this.unset("members");
     } else {
-      this.set("gracePeriod", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get votingPeriod(): BigInt | null {
-    let value = this.get("votingPeriod");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set votingPeriod(value: BigInt | null) {
-    if (!value) {
-      this.unset("votingPeriod");
-    } else {
-      this.set("votingPeriod", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get proposalOffering(): BigInt | null {
-    let value = this.get("proposalOffering");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set proposalOffering(value: BigInt | null) {
-    if (!value) {
-      this.unset("proposalOffering");
-    } else {
-      this.set("proposalOffering", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get quorumPercent(): BigInt | null {
-    let value = this.get("quorumPercent");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set quorumPercent(value: BigInt | null) {
-    if (!value) {
-      this.unset("quorumPercent");
-    } else {
-      this.set("quorumPercent", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get sponsorThreshold(): BigInt | null {
-    let value = this.get("sponsorThreshold");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set sponsorThreshold(value: BigInt | null) {
-    if (!value) {
-      this.unset("sponsorThreshold");
-    } else {
-      this.set("sponsorThreshold", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get minRetentionPercent(): BigInt | null {
-    let value = this.get("minRetentionPercent");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set minRetentionPercent(value: BigInt | null) {
-    if (!value) {
-      this.unset("minRetentionPercent");
-    } else {
-      this.set("minRetentionPercent", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get shareTokenName(): string | null {
-    let value = this.get("shareTokenName");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set shareTokenName(value: string | null) {
-    if (!value) {
-      this.unset("shareTokenName");
-    } else {
-      this.set("shareTokenName", Value.fromString(<string>value));
-    }
-  }
-
-  get shareTokenSymbol(): string | null {
-    let value = this.get("shareTokenSymbol");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set shareTokenSymbol(value: string | null) {
-    if (!value) {
-      this.unset("shareTokenSymbol");
-    } else {
-      this.set("shareTokenSymbol", Value.fromString(<string>value));
-    }
-  }
-
-  get totalShares(): BigInt | null {
-    let value = this.get("totalShares");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set totalShares(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalShares");
-    } else {
-      this.set("totalShares", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get totalLoot(): BigInt | null {
-    let value = this.get("totalLoot");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set totalLoot(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalLoot");
-    } else {
-      this.set("totalLoot", Value.fromBigInt(<BigInt>value));
+      this.set("members", Value.fromStringArray(<Array<string>>value));
     }
   }
 }
 
-export class EventTransaction extends Entity {
+export class Member extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("createdAt", Value.fromString(""));
+    this.set("dao", Value.fromString(""));
+    this.set("memberAddress", Value.fromBytes(Bytes.empty()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
+    this.set("loot", Value.fromBigInt(BigInt.zero()));
+    this.set("delegatingTo", Value.fromBytes(Bytes.empty()));
+    this.set("delegateShares", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save EventTransaction entity without an ID");
+    assert(id != null, "Cannot save Member entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save EventTransaction entity with non-string ID. " +
+        "Cannot save Member entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("EventTransaction", id.toString(), this);
+      store.set("Member", id.toString(), this);
     }
   }
 
-  static load(id: string): EventTransaction | null {
-    return changetype<EventTransaction | null>(
-      store.get("EventTransaction", id)
-    );
+  static load(id: string): Member | null {
+    return changetype<Member | null>(store.get("Member", id));
   }
 
   get id(): string {
@@ -329,5 +109,59 @@ export class EventTransaction extends Entity {
 
   set createdAt(value: string) {
     this.set("createdAt", Value.fromString(value));
+  }
+
+  get dao(): string {
+    let value = this.get("dao");
+    return value!.toString();
+  }
+
+  set dao(value: string) {
+    this.set("dao", Value.fromString(value));
+  }
+
+  get memberAddress(): Bytes {
+    let value = this.get("memberAddress");
+    return value!.toBytes();
+  }
+
+  set memberAddress(value: Bytes) {
+    this.set("memberAddress", Value.fromBytes(value));
+  }
+
+  get shares(): BigInt {
+    let value = this.get("shares");
+    return value!.toBigInt();
+  }
+
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
+  }
+
+  get loot(): BigInt {
+    let value = this.get("loot");
+    return value!.toBigInt();
+  }
+
+  set loot(value: BigInt) {
+    this.set("loot", Value.fromBigInt(value));
+  }
+
+  get delegatingTo(): Bytes {
+    let value = this.get("delegatingTo");
+    return value!.toBytes();
+  }
+
+  set delegatingTo(value: Bytes) {
+    this.set("delegatingTo", Value.fromBytes(value));
+  }
+
+  get delegateShares(): BigInt {
+    let value = this.get("delegateShares");
+    return value!.toBigInt();
+  }
+
+  set delegateShares(value: BigInt) {
+    this.set("delegateShares", Value.fromBigInt(value));
   }
 }
