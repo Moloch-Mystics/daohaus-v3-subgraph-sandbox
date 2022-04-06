@@ -81,6 +81,7 @@ type Proposal @entity {
   votes: [Vote!] @derivedFrom(field: "proposal")
 }
 
+
 type Vote @entity {
   id: ID!
   createdAt: String!
@@ -89,4 +90,20 @@ type Vote @entity {
   balance: BigInt!
   proposal: Proposal!
   member: Member!
+}
+
+type ActivityUri @entity {
+  id: ID!
+  activites: [Activity!] @derivedFrom(field: "dao")
+}
+
+
+type Activity @entity {
+  id: ID!
+  createdAt: String!
+  member: Bytes!
+  dao: ActivityUri!
+  activityType: String!
+  proposalId: BigInt!
+  value: String!
 }

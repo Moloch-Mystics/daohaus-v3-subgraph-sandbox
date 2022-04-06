@@ -974,3 +974,145 @@ export class Vote extends Entity {
     this.set("member", Value.fromString(value));
   }
 }
+
+export class ActivityUri extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save ActivityUri entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type ActivityUri must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("ActivityUri", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ActivityUri | null {
+    return changetype<ActivityUri | null>(store.get("ActivityUri", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get activites(): Array<string> | null {
+    let value = this.get("activites");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set activites(value: Array<string> | null) {
+    if (!value) {
+      this.unset("activites");
+    } else {
+      this.set("activites", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+}
+
+export class Activity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("createdAt", Value.fromString(""));
+    this.set("member", Value.fromBytes(Bytes.empty()));
+    this.set("dao", Value.fromString(""));
+    this.set("activityType", Value.fromString(""));
+    this.set("proposalId", Value.fromBigInt(BigInt.zero()));
+    this.set("value", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Activity entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Activity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Activity", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Activity | null {
+    return changetype<Activity | null>(store.get("Activity", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get createdAt(): string {
+    let value = this.get("createdAt");
+    return value!.toString();
+  }
+
+  set createdAt(value: string) {
+    this.set("createdAt", Value.fromString(value));
+  }
+
+  get member(): Bytes {
+    let value = this.get("member");
+    return value!.toBytes();
+  }
+
+  set member(value: Bytes) {
+    this.set("member", Value.fromBytes(value));
+  }
+
+  get dao(): string {
+    let value = this.get("dao");
+    return value!.toString();
+  }
+
+  set dao(value: string) {
+    this.set("dao", Value.fromString(value));
+  }
+
+  get activityType(): string {
+    let value = this.get("activityType");
+    return value!.toString();
+  }
+
+  set activityType(value: string) {
+    this.set("activityType", Value.fromString(value));
+  }
+
+  get proposalId(): BigInt {
+    let value = this.get("proposalId");
+    return value!.toBigInt();
+  }
+
+  set proposalId(value: BigInt) {
+    this.set("proposalId", Value.fromBigInt(value));
+  }
+
+  get value(): string {
+    let value = this.get("value");
+    return value!.toString();
+  }
+
+  set value(value: string) {
+    this.set("value", Value.fromString(value));
+  }
+}
