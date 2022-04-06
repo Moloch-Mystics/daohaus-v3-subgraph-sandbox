@@ -2,7 +2,7 @@ import { log } from "@graphprotocol/graph-ts";
 
 import { SummonBaal } from "../generated/BaalSummoner/BaalSummoner";
 import { BaalTemplate } from "../generated/templates";
-import { MemberUri, Dao } from "../generated/schema";
+import { MemberUri, ProposalUri, ActivityUri, Dao } from "../generated/schema";
 // import { addTransaction } from "./util/transactions";
 import { constants } from "./util/constants";
 
@@ -12,6 +12,15 @@ export function handleSummonBaal(event: SummonBaal): void {
   let daoId = event.params.baal.toHexString();
   let memberUri = new MemberUri(daoId);
   if (memberUri === null) {
+    return;
+  }
+  let proposalUri = new ProposalUri(daoId);
+  if (proposalUri === null) {
+    return;
+  }
+
+  let activityUri = new ActivityUri(daoId);
+  if (activityUri === null) {
     return;
   }
 
@@ -36,4 +45,6 @@ export function handleSummonBaal(event: SummonBaal): void {
 
   dao.save();
   memberUri.save();
+	proposalUri.save()
+	activityUri.save()
 }
