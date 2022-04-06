@@ -149,6 +149,57 @@ export function handleTransferLoot(event: TransferLoot): void {
 
 }
 
+// Transfer (index_topic_1 address from, index_topic_2 address to, uint256 value)
+export function handleTransfer(event: Transfer): void {
+  log.info("handleTransfer, to: {}, from: {}, address: {}", [
+    event.params.to.toHexString(),
+    event.params.from.toHexString(),
+    event.address.toHexString(),
+  ]);
+
+  let dao = Dao.load(event.address.toHexString());
+  if (dao === null) {
+    return;
+  }
+
+  //if from zero address it mints to a member
+  if (event.params.from.toHexString() === constants.ADDRESS_ZERO) {
+    let memberId = event.address
+      .toHexString()
+      .concat("-member-")
+      .concat(event.params.from.toHexString());
+
+    mintShares(event, dao, memberId);
+    return;
+  }
+
+  //if to baal it burns from member
+  if (event.params.to === event.address) {
+    let memberId = event.address
+      .toHexString()
+      .concat("-member-")
+      .concat(event.params.from.toHexString());
+
+    burnShares(dao, memberId, event.params.amount);
+    return;
+  }
+
+  //if member to member it transfers (add/subtract)
+  let burnMemberId = event.address
+    .toHexString()
+    .concat("-member-")
+    .concat(event.params.from.toHexString());
+
+  let mintMemberId = event.address
+    .toHexString()
+    .concat("-member-")
+    .concat(event.params.to.toHexString());
+
+  burnShares(dao, burnMemberId, event.params.amount);
+  mintShares(event, dao, mintMemberId);
+
+}
+
 export function handleSetupComplete(event: SetupComplete): void {
   let daoId = event.address.toHexString();
 
