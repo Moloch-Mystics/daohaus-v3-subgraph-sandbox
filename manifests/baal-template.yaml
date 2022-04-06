@@ -18,8 +18,6 @@ mapping:
       handler: handleSetupComplete
     - event: "GovernanceConfigSet(uint32,uint32,uint256,uint256,uint256,uint256)"
       handler: handleGovernanceConfigSet
-    - event: "ShamanSet(indexed address,uint256)"
-      handler: handleShamanSet
     - event: "Transfer(indexed address,indexed address,uint256)"
       handler: handleTransfer
     - event: "TransferLoot(indexed address,indexed address,uint256)"
