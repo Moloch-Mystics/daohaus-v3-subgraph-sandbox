@@ -37,7 +37,7 @@ type Member @entity {
 
 type ProposalUri @entity {
   id: ID!
-  members: [Proposal!] @derivedFrom(field: "dao")
+  proposals: [Proposal!] @derivedFrom(field: "dao")
 }
 
 type Proposal @entity {
