@@ -391,8 +391,8 @@ export class ProposalUri extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get members(): Array<string> | null {
-    let value = this.get("members");
+  get proposals(): Array<string> | null {
+    let value = this.get("proposals");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -400,11 +400,11 @@ export class ProposalUri extends Entity {
     }
   }
 
-  set members(value: Array<string> | null) {
+  set proposals(value: Array<string> | null) {
     if (!value) {
-      this.unset("members");
+      this.unset("proposals");
     } else {
-      this.set("members", Value.fromStringArray(<Array<string>>value));
+      this.set("proposals", Value.fromStringArray(<Array<string>>value));
     }
   }
 }
